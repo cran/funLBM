@@ -1,0 +1,8 @@
+import(fda,parallel,funFEM)
+importFrom(graphics,plot)
+importFrom("grDevices", "palette")
+importFrom("graphics", "barplot", "lines", "par")
+importFrom("stats", "dnorm", "kmeans", "model.matrix","rmultinom","rnorm")
+export("funLBM","ari","plot.funLBM","simulateData","print.funLBM")
+S3method(plot,funLBM)
+S3method(print,funLBM)
