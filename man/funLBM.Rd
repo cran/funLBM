@@ -4,15 +4,16 @@
 The functional latent block model
 }
 \description{
-The funLBM algorithm allows to simultaneously cluster the rows and the columns of a data matrix where each entry of the matrix is a function or a time series.
+The funLBM algorithm, proposed by Bouveyron et al. (2018) <doi:10.1111/rssc.12260>, allows to simultaneously cluster the rows and the columns of one or more data matrix where each entry of the matrix is a (univariate or multivariate) function or a time series.
 }
 \usage{
 funLBM(X, K, L, maxit = 50, burn = 25, basis.name = "fourier", nbasis = 15,
-        nbinit = 1, gibbs.it = 3, display = FALSE, init = "kmeans", mc.cores = 1, ...)
+        nbinit = 1, gibbs.it = 3, display = FALSE, init = "funFEM", mc.cores = 1, ...)
 }
 \arguments{
   \item{X}{
-The data array (n x p x T) where each entry corresponds to the measure of one individual i, i=1,...,n, for a functional variable j, j=1,...,p, at point t, t=1,...,T,
+Univariate case: The data array (n x p x T) where each entry corresponds to the measure of one individual i, i=1,...,n, for a functional variable j, j=1,...,p, at point t, t=1,...,T.
+Multivariate case: a list of data array as described hereinabove with one data array by variable.
 }
   \item{K}{
 The number of row clusters,
@@ -52,7 +53,7 @@ Additional parameters to provide to sub-functions.
 }
 }
 \value{
-The resulting object contains, in addition to call information: 
+The resulting object contains, in addition to call information:
 \item{prms}{A list containing all fited parameters for the best model (according to ICL)}
 \item{Z}{The dummy matrix of row clustering}
 \item{W}{The dummy matrix of column clustering}
@@ -66,7 +67,8 @@ The resulting object contains, in addition to call information:
 C. Bouveyron, L. Bozzi, J. Jacques and F.-X. Jollois, The Functional Latent Block Model for the Co-Clustering of Electricity Consumption Curves, Journal of the Royal Statistical Society, Series C, 2018 (https://doi.org/10.1111/rssc.12260).
 }
 \examples{
-## Co-clustering on simulated data with K=4 and L=3
+\donttest{
+## Univariate example: Co-clustering on simulated data
 set.seed(12345)
 X = simulateData(n = 30, p = 30, t = 15)
 out = funLBM(X$data,K=4,L=3)
@@ -80,14 +82,22 @@ plot(out,type='means')
 ari(out$col_clust,X$col_clust)
 ari(out$row_clust,X$row_clust)
 
-\donttest{
+## Multivariate example:
+X = simulateData2(n = 50, p = 50, t = 15)
+out = funLBM(list(X$data1,X$data2),K=4,L=3)
+
+# Visualization of results
+plot(out,type='blocks')
+plot(out,type='proportions')
+plot(out,type='means')
+
+# Evaluating clustering results
+ari(out$col_clust,X$col_clust)
+ari(out$row_clust,X$row_clust)
+
 ## Co-clustering on simulated data with parallel model selection
-## To enable parallel computation (on Linux and Mac systems), 
-## set mc.cores to the number of available CPUs
-## and increase nbinit to allow the best possible fit
-set.seed(12345)
 X = simulateData(n = 30, p = 30, t = 15)
-out = funLBM(X$data,K=2:4,L=2:4,init = "funFEM",mc.cores = 1,nbinit = 1)
+out = funLBM(X$data,K=2:4,L=2:4,mc.cores = 4)
 
 # Evaluating clustering results
 ari(out$col_clust,X$col_clust)

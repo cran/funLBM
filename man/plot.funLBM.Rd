@@ -16,7 +16,7 @@ Plotting of funLBM co-clustering results:  functional means, block matrix, param
 An object produced by the funLBM function,
 }
   \item{type}{
-The type of plot to display. Possible plots are 'blocks' (default), 'means', 'evolution', 'criterion', 'likelihood', 'proportions',
+The type of plot to display. Possible plots are 'blocks' (default), 'means', 'evolution', 'likelihood', 'proportions',
 }
   \item{\dots}{
 Additional arguments to provide.
@@ -26,6 +26,7 @@ Additional arguments to provide.
 \code{\link{funLBM}}
 }
 \examples{
+\donttest{
 ## Co-clustering of the Velib data
 X = simulateData(n = 30, p = 30, t = 15)
 out = funLBM(X$data,K=4,L=3)
@@ -34,4 +35,5 @@ out = funLBM(X$data,K=4,L=3)
 plot(out,type='blocks')
 plot(out,type='proportions')
 plot(out,type='means')
+}
 }

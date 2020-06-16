@@ -23,8 +23,10 @@ Additional arguments to provide.
 \code{\link{funLBM}}
 }
 \examples{
+\donttest{
 ## Co-clustering of the Velib data
 X = simulateData(n = 30, p = 30, t = 15)
 out = funLBM(X$data,K=4,L=3)
 out
+}
 }

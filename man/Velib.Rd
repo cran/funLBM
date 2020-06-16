@@ -22,8 +22,9 @@ The data were first used in C. Bouveyron, E. Come and J. Jacques, The discrimina
 }
 \examples{
 data(Velib)
+
 \donttest{
-# Co-clustering
+# Co-clustering with funLBM
 out = funLBM(Velib$data,K=4,L=2)
 
 # Visualization of results

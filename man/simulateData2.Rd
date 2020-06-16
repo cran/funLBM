@@ -1,12 +1,12 @@
-\name{simulateData}
-\alias{simulateData}
+\name{simulateData2}
+\alias{simulateData2}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{Simulate data for funLBM}
+\title{Simulate bivariate data for funLBM}
 \description{
-Simulate data according to the funLBM model with K=4 groups for rows and L=3 groups for columns.
+Simulate bivariate data according to the funLBM model with K=4 groups for rows and L=3 groups for columns.
 }
 \usage{
-simulateData(n = 100, p = 100, t = 30)
+simulateData2(n = 100, p = 100, t = 30)
 }
 \arguments{
   \item{n}{
@@ -20,8 +20,9 @@ The number of measures for the functions of the simulated data array.
 }
 }
 \value{
-The resulting object contains: 
-\item{data}{ data array of size n x p x t}
+The resulting object contains:
+\item{data1}{ data array of size n x p x t for first variable}
+\item{data2}{ data array of size n x p x t for second variable}
 \item{row_clust}{Group memberships of rows}
 \item{col_clust}{Group memberships of columns}
 }
@@ -33,11 +34,12 @@ C. Bouveyron, L. Bozzi, J. Jacques and F.-X. Jollois, The Functional Latent Bloc
 }
 \examples{
 # Simulate data and co-clustering
-X = simulateData(n = 30, p = 30, t = 15)
+set.seed(12345)
+X = simulateData2(n = 50, p = 50, t = 15)
 
 \donttest{
 # Co-clustering with funLBM
-out = funLBM(X$data,K=4,L=3)
+out = funLBM(list(X$data1,X$data2),K=4,L=3)
 
 # Visualization of results
 plot(out,type='blocks')

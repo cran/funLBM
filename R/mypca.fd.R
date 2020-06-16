@@ -1,100 +1,102 @@
-mypca.fd <-
-function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj), centerfns = TRUE){
-  #  Carry out a functional PCA with regularization
-  #  Arguments:
-  #  FDOBJ      ... Functional data object
-  #  NHARM     ... Number of principal components or harmonics to be kept
-  #  HARMFDPAR ... Functional parameter object for the harmonics
-  #  CENTERFNS ... If TRUE, the mean function is first subtracted from each function
-  #
-  #  Returns:  An object PCAFD of class "pca.fd" with these named entries:
-  #  harmonics  ... A functional data object for the harmonics or eigenfunctions
-  #  values     ... The complete set of eigenvalues
-  #  scores     ... A matrix of scores on the principal components or harmonics
-  #  varprop    ... A vector giving the proportion of variance explained
-  #                 by each eigenfunction
-  #  meanfd     ... A functional data object giving the mean function
-  Ti = rep(1,ncol(fdobj$coefs))
-  
-  #  Check FDOBJ
-  if (!(inherits(fdobj, "fd"))) stop(
-    "Argument FD  not a functional data object.")
-  
-  #  compute mean function and center if required
-  # browser()
-  meanfd <- mean.fd(fdobj)
-  # if (centerfns) fdobj <- center.fd(fdobj)
-  
-  if (centerfns){
-    coefmean <- apply(t(as.matrix(Ti) %*% matrix(1,1,nrow(fdobj$coefs))) * fdobj$coefs, 1, sum) / sum(Ti)
-    fdobj$coefs <- sweep(fdobj$coefs, 1, coefmean)
-    meanfd$coefs = as.matrix(data.frame(mean=coefmean))
+mypca.fd <- function(fdobj,center=TRUE){
+    call = match.call()
+    if (class(fdobj)=="list"){
+
+      #save object before center data
+      mean_fd<-list()
+      for (i in 1:length(fdobj)){
+        mean_fd[[i]]<-fdobj[[i]]
+      }
+
+      #center each functional dataset
+      if (isTRUE(center)){
+        for (i in 1:length(fdobj)){
+          coefmean <- apply(fdobj[[i]]$coefs, 1, mean)
+          fdobj[[i]]$coefs <- sweep(fdobj[[i]]$coefs, 1, coefmean)
+          mean_fd[[i]]$coefs = as.matrix(data.frame(mean=coefmean))
+        }
+      }
+
+      #Calculate W for each dataset, matrix of basis functions inner product
+      for (i in 1:length(fdobj)){
+        name<-paste('W_var',i,sep='')
+        W_fdobj<-inprod(fdobj[[i]]$basis,fdobj[[i]]$basis)
+        assign(name,W_fdobj)
+      }
+
+      #Addition of 0 before merging all matrices into \phi (cf. Publication)
+      prow<-dim(W_fdobj)[[1]]
+      pcol<-length(fdobj)*prow
+      W1<-cbind(W_fdobj,matrix(0,nrow=prow,ncol=(pcol-ncol(W_fdobj))))
+      W_list<-list()
+      for (i in 2:(length(fdobj))){
+        W2<-cbind(matrix(0,nrow=prow,ncol=(i-1)*ncol(W_fdobj)),get(paste('W_var',i,sep='')),matrix(0,nrow=prow,ncol=(pcol-i*ncol(W_fdobj))))
+        W_list[[i-1]]<-W2
+      }
+
+      #Creation of \phi
+      W_tot<-rbind(W1,W_list[[1]])
+      if (length(fdobj)>2){
+        for(i in 2:(length(fdobj)-1)){
+          W_tot<-rbind(W_tot,W_list[[i]])
+        }
+      }
+      #To avoid numerical issues, the smallest inner product are set to 0
+      W_tot[W_tot<1e-15]=0
+
+      #Creation of C, the coefficients matrix
+      coef<-t(fdobj[[1]]$coefs)
+      for (i in 2:length(fdobj)){
+        coef<-cbind(coef,t(fdobj[[i]]$coefs))
+      }
+
+      mat_interm<-1/sqrt(ncol(fdobj[[1]]$coefs)-1)*coef%*%chol(W_tot,pivot=TRUE)
+      cov<-t(mat_interm)%*%mat_interm
+      valeurs<-Eigen(cov)
+      valeurs_propres<-valeurs$values
+      vecteurs_propres<-valeurs$vectors
+      #Calculation on eigenfunctions coefficients
+      bj<-solve(chol(W_tot))%*%vecteurs_propres
+      fonctionspropres<-fdobj[[1]]
+      fonctionspropres$coefs<-bj
+      scores<-coef%*%W_tot%*%bj
+
+      varprop<-valeurs_propres/sum(valeurs_propres)
+
+      pcafd<-list(call=call,values=valeurs_propres,harmonics=fonctionspropres,scores=scores,U=bj,varprop=varprop,meanfd=mean_fd,Wmat=W_tot)
+
+    }else if (class(fdobj)!="list") {
+      #save object before center data
+      mean_fd<-fdobj
+      if (isTRUE(center)){
+        #center each functional dataset
+        coefmean <- apply(fdobj$coefs, 1, mean)
+        fdobj$coefs <- sweep(fdobj$coefs, 1, coefmean)
+        mean_fd$coefs = as.matrix(data.frame(mean=coefmean))
+      }
+      #Calculate W, matrix of basis functions inner product
+      W<-inprod(fdobj$basis,fdobj$basis)
+      #To avoid numerical issues, the smallest inner product are set to 0
+      W[W<1e-15]=0
+
+      coef<-t(fdobj$coefs)
+      mat_interm<-1/sqrt(ncol(fdobj$coefs)-1)*coef%*%chol(W)
+      cov<-t(mat_interm)%*%mat_interm
+      valeurs<-Eigen(cov)
+      valeurs_propres<-valeurs$values
+      vecteurs_propres<-valeurs$vectors
+      #Calculation on eigenfunctions coefficients
+      fonctionspropres<-fdobj
+      bj<-solve(chol(W))%*%vecteurs_propres
+      fonctionspropres$coefs<-bj
+      #Scores calculation according to pca.fd formula
+      scores<-inprod(fdobj,fonctionspropres)
+
+      varprop<-valeurs_propres/sum(valeurs_propres)
+
+      pcafd <-list(call=call,values=valeurs_propres,harmonics=fonctionspropres,scores=scores,U=bj, varprop=varprop,meanfd=mean_fd,Wmat=W)
+
+    }
+    class(pcafd) <- "mfpca"
+    return(pcafd)
   }
-  
-  #  get coefficient matrix and its dimensions
-  coef  <- fdobj$coefs
-  coefd <- dim(coef)
-  ndim  <- length(coefd)
-  nrep  <- coefd[2]
-  coefnames <- dimnames(coef)
-  if (nrep < 2) stop("PCA not possible without replications.")
-  
-  basisobj <- fdobj$basis
-  nbasis   <- basisobj$nbasis
-  type     <- basisobj$type
-  
-  #  set up HARMBASIS
-  #  currently this is required to be BASISOBJ
-  harmbasis <- basisobj
-  
-  #  set up LFDOBJ and LAMBDA
-  Lfdobj <- harmfdPar$Lfd
-  lambda <- harmfdPar$lambda
-  
-  #  compute CTEMP whose cross product is needed
-  ctemp <- coef
-  
-  #  set up cross product and penalty matrices
-  #   Cmat <- crossprod(t(ctemp))/nrep
-  Cmat = (Ti * ctemp) %*% t(ctemp) / nrep
-  
-  Jmat <- eval.penalty(basisobj, 0)
-  if(lambda > 0) {
-    Kmat <- eval.penalty(basisobj, Lfdobj)
-    Wmat <- Jmat + lambda * Kmat
-  } else {    Wmat <- Jmat  }
-  Wmat <- (Wmat + t(Wmat))/2
-  
-  #  compute the Choleski factor of Wmat
-  Lmat    <- chol(Wmat)
-  Lmat.inv <- solve(Lmat)
-  
-  #  set up matrix for eigenanalysis
-  if(lambda > 0) { Cmat <- t(Lmat.inv) %*% Jmat %*% Cmat %*% Jmat %*% Lmat.inv  }
-  else { Cmat <- Lmat %*% Cmat %*% t(Lmat)  }
-  
-  #  eigenalysis
-  Cmat    <- (Cmat + t(Cmat))/2
-  result  <- eigen(Cmat)
-  eigvalc <- result$values
-  eigvecc <- as.matrix(result$vectors[, 1:nharm])
-  sumvecc <- apply(eigvecc, 2, sum)
-  eigvecc[,sumvecc < 0] <-  - eigvecc[, sumvecc < 0]
-  
-  varprop <- eigvalc[1:nharm]/sum(eigvalc)
-  
-  
-  harmcoef <- Lmat.inv %*% eigvecc
-  U = t(Lmat) %*% eigvecc
-  harmscr  <- t(ctemp) %*% U
-  
-  harmnames <- rep("", nharm)
-  for(i in 1:nharm)
-    harmnames[i] <- paste("PC", i, sep = "")
-  harmnames <- list(coefnames[[1]], harmnames,"values")
-  harmfd   <- fd(harmcoef, basisobj, harmnames)
-  
-  pcafd  <- list(harmonics=harmfd,values=eigvalc,scores=harmscr,U=U,varprop=varprop,meanfd=meanfd,W=Wmat)
-  class(pcafd) <- "pca.fd"
-  return(pcafd)
-}
