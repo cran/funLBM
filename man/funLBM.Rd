@@ -95,22 +95,24 @@ plot(out,type='means')
 ari(out$col_clust,X$col_clust)
 ari(out$row_clust,X$row_clust)
 
-## Co-clustering on simulated data with parallel model selection
-X = simulateData(n = 30, p = 30, t = 15)
-out = funLBM(X$data,K=2:4,L=2:4,mc.cores = 4)
+## The following examples could take a few minutes to run!
 
-# Evaluating clustering results
-ari(out$col_clust,X$col_clust)
-ari(out$row_clust,X$row_clust)
+## Co-clustering on simulated data with parallel model selection
+#X = simulateData(n = 30, p = 30, t = 15)
+#out = funLBM(X$data,K=2:4,L=2:4,mc.cores = 4)
+
+## Evaluating clustering results
+#ari(out$col_clust,X$col_clust)
+#ari(out$row_clust,X$row_clust)
 
 ## Co-clustering of Velib data
-data(Velib)
-out = funLBM(Velib$data,K=4,L=2)
+#data(Velib)
+#out = funLBM(Velib$data,K=4,L=2)
 
-# Visualization of results
-plot(out,type='blocks')
-plot(out,type='proportions')
-plot(out,type='means')
+## Visualization of results
+#plot(out,type='blocks')
+#plot(out,type='proportions')
+#plot(out,type='means')
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

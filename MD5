@@ -1,5 +1,5 @@
-4c486808506882b20232006bae614350 *DESCRIPTION
-7f0ffa445ef84d07648dacce55ebfa24 *NAMESPACE
+2f4aebab973e609a87e6b04ca0523bcb *DESCRIPTION
+5c9687246cb8fb052ebb5b5fa8d24c7c *NAMESPACE
 f53258107570aae69b43e3bfacc9e039 *R/Mode.R
 a93868305ed5d0f864d395d7eec07c75 *R/ari.R
 ef71a904565af614cadf969d2a1643f9 *R/cattell.R
@@ -13,7 +13,8 @@ e2b5d8a55e0ab3a4c2bc8cc38874b1a6 *R/estep.Z.cost.R
 e2643b2a1e65da7d0385d2303795259b *R/estep.lik.cost.R
 5971ff7a0dcee1344cbf427e5a77d8dc *R/funLBM.R
 a0a8907a4f05d8386ed615f431261eca *R/funLBM.main.R
-6b8735ad43203c84ce4aa9c12ddad49c *R/mypca.fd.R
+336ed35e8f577ea19263da90816a6712 *R/mypca.fd.R
+47e26982e9adf430cbee867f5f9ea266 *R/plot.fd.R
 056e3013c923e871851cc78dd3ac53dc *R/plot.funLBM.R
 daa932e4a4461961195247ac2c138d8f *R/print.funLBM.R
 4cc1c2df93680444654556b4641b7ce9 *R/simulateData.R
@@ -22,7 +23,8 @@ dc0b93fe103234a6a42d5742df6507c2 *data/Velib.rda
 dfca8e8a87252863849041b1303a3b0b *inst/doc/funLBM_vignette.pdf
 067d0b3168c4d1ba2a01dae5877e1bd1 *man/Velib.Rd
 a9b26babb9da4443ef9733593434b6bc *man/ari.Rd
-7aa1d5102944a4d2268c1e6d9dc879c5 *man/funLBM.Rd
+2da925786e244394714aecdbb4d193db *man/funLBM.Rd
+447091f8987e2b5f33fc48a13e28a6b5 *man/plot.fd.Rd
 f7e556136a4c7c45bfd691255f339fd5 *man/plot.funLBM.Rd
 ebc89c555ac1ed7cae34d9ca05d8f7e4 *man/print.funLBM.Rd
 b4e7817a1dfc10cac6ba0cc2b2436c32 *man/simulateData.Rd
