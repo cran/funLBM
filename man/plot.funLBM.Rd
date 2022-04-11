@@ -27,7 +27,8 @@ Additional arguments to provide.
 }
 \examples{
 \donttest{
-## Co-clustering of the Velib data
+## Co-clustering of simulated data
+set.seed(12345)
 X = simulateData(n = 30, p = 30, t = 15)
 out = funLBM(X$data,K=4,L=3)
 

@@ -1,7 +1,6 @@
 mypca.fd <- function(fdobj,center=TRUE){
   call = match.call()
-  if (class(fdobj)=="list"){
-    
+  if (inherits(fdobj,"list")){
     #save object before center data
     mean_fd<-list()
     for (i in 1:length(fdobj)){
@@ -65,7 +64,7 @@ mypca.fd <- function(fdobj,center=TRUE){
     
     pcafd<-list(call=call,values=valeurs_propres,harmonics=fonctionspropres,scores=scores,U=bj,varprop=varprop,meanfd=mean_fd,Wmat=W_tot)
     
-  }else if (class(fdobj)!="list") {
+  } else {
     #save object before center data
     mean_fd<-fdobj
     if (isTRUE(center)){

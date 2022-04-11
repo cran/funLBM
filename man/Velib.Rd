@@ -24,8 +24,9 @@ The data were first used in C. Bouveyron, E. Come and J. Jacques, The discrimina
 data(Velib)
 
 \donttest{
+set.seed(12345)
 # Co-clustering with funLBM
-out = funLBM(Velib$data,K=4,L=2)
+out = funLBM(Velib$data,K=4,L=2,basis.name="fourier",nbasis=5)
 
 # Visualization of results
 plot(out,type='blocks')

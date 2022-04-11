@@ -95,7 +95,8 @@ plot(out,type='means')
 ari(out$col_clust,X$col_clust)
 ari(out$row_clust,X$row_clust)
 
-## The following examples could take a few minutes to run!
+## The following examples could take a few minutes to run
+## and depend on the number of available CPU cores!
 
 ## Co-clustering on simulated data with parallel model selection
 #X = simulateData(n = 30, p = 30, t = 15)

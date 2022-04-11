@@ -32,6 +32,7 @@ C. Bouveyron, L. Bozzi, J. Jacques and F.-X. Jollois, The Functional Latent Bloc
 \code{\link{funLBM}}
 }
 \examples{
+set.seed(12345)
 # Simulate data and co-clustering
 X = simulateData(n = 30, p = 30, t = 15)
 
